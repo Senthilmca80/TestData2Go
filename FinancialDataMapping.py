@@ -110,12 +110,12 @@ columns = [
     'card_type', 'asset_value', 'liability_type'
 ]
 
-generated_data = []
+def returnSyntheticData(column):
+    generated_data = []
+    for i in range(0, 100):
+        generated_data.append(generate_fake_data(columns))
+    fake_df = pd.DataFrame(generated_data)
+    return fake_df
 
-for i in range(0, 100):
-     generated_data.append(generate_fake_data(columns))
-     
+#print(fake_df)
 
-fake_df = pd.DataFrame(generated_data)
-
-print(fake_df)
