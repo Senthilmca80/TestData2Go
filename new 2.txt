@@ -1,4 +1,3 @@
-from collections import defaultdict
 from faker import Faker
 import random
 import pandas as pd
@@ -9,28 +8,27 @@ import DynamicMapping as dynamicmapping
 # Initialize the Faker instance
 fake = Faker()
 model ={
-         "personal_info_model": [
-        {"name": "User ID", "type": "uuid"},
+        "personal_info_model" :[
         {"name": "Name", "type": "name"},
         {"name": "Gender", "type": "gender"},
         {"name": "SSN", "type": "ssn"},
         {"name": "Driving License", "type": "driving_license"},
         {"name": "Address", "type": "address", "address_format": "split"}
-    ],
-    "accounts_data_model": [
-        {"name": "Account ID", "type": "uuid"},
-        {"name": "User ID", "type": "link"},  # Link to personal_info_model
-        {"name": "Account Type", "type": "choice", "choices": ["savings", "checking", "business"]},
-        {"name": "Balance", "type": "number", "min": 1000, "max": 50000},
-        {"name": "Creation Date", "type": "datetime"},
-        {"name": "Is Verified", "type": "boolean"}
-    ],
-    "Transaction_data_model": [
-        {"name": "Transaction ID", "type": "uuid"},
-        {"name": "User ID", "type": "link"},  # Link to personal_info_model
-        {"name": "Account ID", "type": "link"},  # Link to accounts_data_model
-        {"name": "Transaction Type", "type": "dynamic_link","dynamic_link": {"model": "accounts_data_model", "field": "Account Type"}}  # Dynamically link to Account Type
-    ]
+        ],
+        "accounts_data_model":[
+            {"name": "Account ID", "type": "uuid"},
+            {"name": "User ID", "type": "uuid"},  
+            {"name": "Account Type", "type": "choice", "choices": ["savings", "checking", "business"]},
+            {"name": "Balance", "type": "number", "min": 1000, "max": 50000},
+            {"name": "Creation Date", "type": "datetime"},
+            {"name": "Is Verified", "type": "boolean"}  
+
+        ],
+        "Transaction_data_model":[
+            {"name": "Transaction ID", "type": "uuid"},
+            {"name": "User ID", "type": "uuid"},  
+            {"name": "Trsansaction Type", "type": "choice", "choices": ["Buy", "Sell"]},
+        ]
 }
 
 
@@ -85,37 +83,14 @@ def generate_dynamic_data(model_schemas):
     :param model_schemas: A dictionary of model names with their respective field definitions.
     :return: A dictionary with fake data for each model.
     """
-    allDataModel = {}
+    fake_data = {}
     for model_name, schema in model_schemas.items():
-        print (model_name)
-        currentDataModel=dynamicmapping.generate_data_from_model(schema,num_records)
-        fakeDataGenerator=dynamiclink_check(schema,currentDataModel,allDataModel)
-        allDataModel[model_name] = fakeDataGenerator #dynamicmapping.generate_data_from_model(schema,num_records)
+        fake_data[model_name] = dynamicmapping.generate_data_from_model(schema,num_records)
+        fakeDataGenerator=dynamicmapping.generate_data_from_model(schema,num_records)
         converttoDF=pd.DataFrame(fakeDataGenerator)
         converttoDF.to_csv(model_name+'.csv',index=False)
     
-    return allDataModel
-
-def dynamiclink_check(schema,currentDataModel,allDataModel):
-    for field in schema:
-        field_name = field["name"]
-        field_type = field["type"]
-        if(field_type == "dynamic_link"):
-           link_config=field["dynamic_link"]
-           target_model_name = link_config["model"]
-           target_field = link_config["field"]
-           if target_model_name in allDataModel:
-            # Ensure the model data is a list (i.e., multiple records in a model)
-                linked_model_data =  [item[target_field] for item in allDataModel[target_model_name] if isinstance(item, dict) and target_field in item]
-                if linked_model_data:
-                         for item in currentDataModel:
-                             item[field_name]=random.choice(linked_model_data)
-                         print(random.choice(linked_model_data))
-                else:
-                    print(f"Warning: Target model '{target_model_name}' does not contain any data for field '{target_field}'.")
-                 
-    return currentDataModel
-               
+    return fake_data
 
 #print(generate_dynamic_data(model))
 
@@ -127,5 +102,4 @@ def returnAPIResponse(accounts_data_model):
 '''
 resp= returnAPIResponse(accounts_data_model)
 print(resp)
-
 '''

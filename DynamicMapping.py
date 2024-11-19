@@ -22,7 +22,10 @@ def get_field_name(field_name):
     return field_name  # if no match, return the original field name
 
 # Function to generate synthetic data based on the custom data model with custom validation
-def generate_data_from_model(data_model, num_records=100, min_age=18, max_age=65, parent_data=None):
+def generate_data_from_model(data_model, num_records=100, 
+                             min_age=18, max_age=65, 
+                             parent_data=None,all_data=None,
+                             existing_data=None, dynamic_links=None,):
     data = []
     
     for _ in range(num_records):
@@ -126,7 +129,7 @@ def generate_data_from_model(data_model, num_records=100, min_age=18, max_age=65
                 record[standardized_field_name] = fake.timezone()
             elif field_type == 'region':
                 record[standardized_field_name] = fake.state()
-             elif field_type == 'transaction_id':
+            elif field_type == 'transaction_id':
                 record[standardized_field_name] = uuid.uuid4().hex
             elif field_type == 'amount_paid':
                 record[standardized_field_name] = round(random.uniform(10.0, 1000.0), 2)
@@ -166,6 +169,17 @@ def generate_data_from_model(data_model, num_records=100, min_age=18, max_age=65
                 record[standardized_field_name] = fake.state()
             elif field_type == 'customer_id':
                 record[standardized_field_name] = fake.uuid4().hex
+            elif isinstance(field_type, dict) and "dynamic_link" in field_type:
+                # Handle dynamic linking between models
+                link_config = field_type["dynamic_link"]
+                target_model_name = link_config["model"]
+                target_field = link_config["field"]
+                
+                # Get data from the linked model
+                if target_model_name in all_data:
+                    linked_model_data = [item[target_field] for item in all_data[target_model_name]]
+                    return random.choice(linked_model_data)
+                return None
             else:
                 record[standardized_field_name] = None
         
