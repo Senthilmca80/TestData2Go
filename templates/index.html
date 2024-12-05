@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestData2Go Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-database"></i>
+                <h1>TestData2Go</h1>
+            </div>
+            <p>Generate synthetic test data with intelligent mapping</p>
+        </header>
+
+        <main>
+            <div class="card model-container">
+                <div class="card-header">
+                    <h2><i class="fas fa-code"></i> Data Model Configuration</h2>
+                    <div class="template-selector">
+                        <select id="templateSelect" onchange="loadTemplate()">
+                            <option value="personal">Personal Info Template</option>
+                            <option value="financial">Financial Data Template</option>
+                            <option value="custom">Custom Template</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="model-editor">
+                    <textarea id="modelConfig" rows="15" spellcheck="false" placeholder="Enter your data model configuration in JSON format...">
+{
+    "personal_info_model": [
+        {"name": "User ID", "type": "uuid"},
+        {"name": "Name", "type": "name"},
+        {"name": "Gender", "type": "gender"},
+        {"name": "SSN", "type": "ssn"},
+        {"name": "Driving License", "type": "driving_license"},
+        {"name": "Address", "type": "address", "address_format": "split"}
+    ]
+}</textarea>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="formatJSON()" class="format-btn">
+                        <i class="fas fa-code"></i> Format JSON
+                    </button>
+                    <button onclick="generateData()" class="generate-btn">
+                        <i class="fas fa-play"></i> Generate Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="card results-container">
+                <div class="card-header">
+                    <h2><i class="fas fa-table"></i> Generated Data</h2>
+                    <div class="results-actions">
+                        <button onclick="copyToClipboard()" class="icon-btn" title="Copy to Clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button onclick="downloadCSV()" class="icon-btn" id="downloadBtn" title="Download CSV">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="results" class="results-display">
+                    <div class="placeholder-text">
+                        <i class="fas fa-arrow-up"></i>
+                        <p>Configure your model and click Generate Data to start</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function generateData() {
+            const modelConfig = document.getElementById('modelConfig').value;
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Generating data...</div>';
+            
+            try {
+                const config = JSON.parse(modelConfig);
+                
+                const response = await fetch('/api/getSampleData', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+                resultsDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                // Show download button
+                document.getElementById('downloadBtn').style.display = 'block';
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-circle"></i> Error: ' + error.message + '</div>';
+            }
+        }
+
+        function formatJSON() {
+            try {
+                const textarea = document.getElementById('modelConfig');
+                const formatted = JSON.stringify(JSON.parse(textarea.value), null, 4);
+                textarea.value = formatted;
+            } catch (error) {
+                alert('Invalid JSON format');
+            }
+        }
+
+        function copyToClipboard() {
+            const resultsText = document.querySelector('#results pre')?.textContent;
+            if (resultsText) {
+                navigator.clipboard.writeText(resultsText)
+                    .then(() => alert('Copied to clipboard!'))
+                    .catch(err => alert('Failed to copy'));
+            }
+        }
+
+        function downloadCSV() {
+            alert('CSV files have been generated and saved in the application directory.');
+        }
+
+        function loadTemplate() {
+            const select = document.getElementById('templateSelect');
+            const templates = {
+                personal: {
+                    "personal_info_model": [
+                        {"name": "User ID", "type": "uuid"},
+                        {"name": "Name", "type": "name"},
+                        {"name": "Gender", "type": "gender"},
+                        {"name": "SSN", "type": "ssn"},
+                        {"name": "Address", "type": "address", "address_format": "split"}
+                    ]
+                },
+                financial: {
+                    "accounts_data_model": [
+                        {"name": "Account ID", "type": "uuid"},
+                        {"name": "Account Type", "type": "choice", "choices": ["savings", "checking", "business"]},
+                        {"name": "Balance", "type": "number", "min": 1000, "max": 50000},
+                        {"name": "Creation Date", "type": "datetime"}
+                    ]
+                },
+                custom: {}
+            };
+            
+            const template = templates[select.value] || templates.custom;
+            document.getElementById('modelConfig').value = JSON.stringify(template, null, 4);
+        }
+    </script>
+</body>
+</html> 
