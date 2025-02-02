@@ -21,13 +21,136 @@ def get_field_name(field_name):
             return key  # return the standardized field name
     return field_name  # if no match, return the original field name
 
+def  generate_field_value(field_name, field_type):
+       
+            if field_type == 'gender':
+                return random.choice(['male', 'female'])
+            if field_type == 'name':
+                # If gender is provided, generate name accordingly
+                gender = random.choice(['male', 'female'])
+                if gender == 'male':
+                    return  fake.first_name_male() + " " + fake.last_name_male()
+                elif gender == 'female':
+                    return  fake.first_name_female() + " " + fake.last_name_female()
+            elif field_type == 'address':
+                     return  fake.address().replace('\n', ', ')
+            elif field_type == 'email':
+               return  fake.email()
+            elif field_type == 'phone':
+                return   fake.phone_number()
+            elif field_type == 'company':
+                return  fake.company()
+            elif field_type == 'job':
+                return  fake.job()
+            elif field_type == 'date':
+                return  fake.date()
+            elif field_type == 'boolean':
+                # Generate a Boolean value (True or False)
+               return  random.choice([True, False])
+            elif field_type == 'number':
+                return  random.randint(1, 111000000000)
+            elif field_type == 'text':
+                return  fake.text(max_nb_chars=100)
+            elif field_type == 'credit_card':
+                return  fake.credit_card_number(card_type='mastercard')
+            elif field_type == 'datetime':
+                return  fake.date_time_this_century()
+            elif field_type == 'uuid':
+                return  str(uuid.uuid4())
+            elif field_type == 'ip_address':
+                return  fake.ipv4()
+            elif field_type == 'file_path':
+               return  fake.file_path()
+            elif field_type == 'image_url':
+               return  fake.image_url()
+            elif field_type == 'url':
+                return  fake.url()
+            elif field_type  in ('id', 'user  id'):
+                return  fake.random_int(min=1000000000, max=9999999999)
+            elif field_type == 'passport':
+                return  fake.passport_number()
+            elif field_type == 'ssn':
+               return  fake.ssn()
+            elif field_type == 'driving_license':
+                return  fake.license_plate()
+            elif field_type == 'payment_method':
+               return  random.choice(['credit_card', 'debit_card', 'paypal', 'bank_transfer'])
+            elif field_type == 'transaction_id':
+                return  uuid.uuid4().hex
+            elif field_type == 'amount_paid':
+                return  round(random.uniform(10.0, 1000.0), 2)
+            elif field_type == 'payment_status':
+                return random.choice(['successful', 'failed', 'pending'])
+            elif field_type == 'payment_date':
+               return  fake.date_this_year()
+            elif field_type == 'event_name':
+                return fake.bs()
+            elif field_type == 'event_date':
+                return  fake.date_this_year()
+            elif field_type == 'event_location':
+                return  fake.address()
+            elif field_type == 'event_type':
+                return  random.choice(['conference', 'seminar', 'workshop', 'webinar'])
+            elif field_type == 'latitude':
+               return  fake.latitude()
+            elif field_type == 'longitude':
+               return  fake.longitude()
+            elif field_type == 'timezone':
+                return  fake.timezone()
+            elif field_type == 'region':
+                return  fake.state()
+            elif field_type == 'transaction_id':
+                return  uuid.uuid4()
+            elif field_type == 'amount_paid':
+                return  round(random.uniform(10.0, 1000.0), 2)
+            elif field_type == 'payment_status':
+                return  random.choice(['successful', 'failed', 'pending'])
+            elif field_type == 'payment_date':
+                return  fake.date_this_year()
+            elif field_type == 'shipment_tracking_number':
+                return  fake.uuid4().hex
+            elif field_type == 'shipment_status':
+                return  random.choice(['shipped', 'in transit', 'delivered', 'pending'])
+            elif field_type == 'shipment_date':
+               return fake.date_this_year()
+            elif field_type == 'delivery_date':
+                return  fake.date_this_year()
+            elif field_type == 'carrier':
+                return  random.choice(['FedEx', 'UPS', 'DHL', 'USPS'])
+            elif field_type == 'order_id':
+                return  uuid.uuid4().hex
+            elif field_type == 'order_date':
+                return fake.date_this_year()
+            elif field_type == 'order_status':
+                return random.choice(['completed', 'pending', 'canceled', 'refunded'])
+            elif field_type == 'order_total':
+                return  round(random.uniform(20.0, 2000.0), 2)
+            elif field_type == 'sales_id':
+                return  uuid.uuid4().hex
+            elif field_type == 'quantity_sold':
+                return  random.randint(1, 50)
+            elif field_type == 'sales_amount':
+                return  round(random.uniform(10.0, 5000.0), 2)
+            elif field_type == 'sale_date':
+                return  fake.date_this_year()
+            elif field_type == 'sale_status':
+                return  random.choice(['completed', 'returned', 'pending'])
+            elif field_type == 'sale_region':
+                return  fake.state()
+            elif field_type == 'customer_id':
+                return  fake.uuid4()
+            elif field_type == 'id':
+                return  uuid.uuid4().hex
+            else:
+               return  None
+
 # Function to generate synthetic data based on the custom data model with custom validation
 def generate_data_from_model(data_model, num_records=100, 
                              min_age=18, max_age=65, 
                              parent_data=None,all_data=None,
                              existing_data=None, dynamic_links=None,):
     data = []
-    
+    gender=''
     for _ in range(num_records):
         record = {}
         
@@ -38,14 +161,21 @@ def generate_data_from_model(data_model, num_records=100,
             # Standardize the field name based on metadata variations
             standardized_field_name = get_field_name(field_name)
             
+           
             # Handle different data types
             if field_type == 'name':
                 # If gender is provided, generate name accordingly
                 gender = record.get('gender', random.choice(['male', 'female']))
+               
                 if gender == 'male':
                     record[standardized_field_name] = fake.first_name_male() + " " + fake.last_name_male()
                 elif gender == 'female':
-                    record[standardized_field_name] = fake.first_name_female() + " " + fake.last_name_female()
+                    record[standardized_field_name] = fake.first_name_female() + " " + fake.last_name_female()  
+            elif field_type == 'gender':
+                    if gender != '' :
+                        record[standardized_field_name] = gender
+                    else:
+                         record[standardized_field_name] =  random.choice(['male', 'female'])
             elif field_type == 'address':
                 # Custom logic for generating full address or separate components
                 address_format = field.get('address_format', 'full')  # Default to full address

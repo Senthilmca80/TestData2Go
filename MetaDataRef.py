@@ -10,10 +10,10 @@ fake = Faker()
 # Expanded Metadata dictionary for possible field name variations
 FIELD_METADATA = {
     # Personal Information
-    "name": ["firstname", "fname", "person name", "legal name", "full name", "given name", "first name", "last name", "user name", "user full name"],
+    "name": ["firstname", "fname", "person name", "legal name", "full name", "given name", "first name", "last name", "user name", "user full name", "name"],
     "email": ["email address", "email", "contact email", "email id", "user email", "email address"],
     "phone": ["phone number", "mobile", "contact number", "telephone", "cell number", "contact phone", "mobile number", "phone number", "home phone"],
-    "dob": ["dob", "date of birth", "birth date", "birthdate", "age"],
+    "date": ["dob", "date of birth", "birth date", "birthdate", "age"],
     "gender": ["gender", "sex", "person gender", "user gender", "sex", "user sex"],
     
     # Address
@@ -95,6 +95,8 @@ FIELD_METADATA = {
     "sale_date": ["sale_date", "transaction_date", "sale_timestamp", "sales_date"],
     "sale_status": ["sale_status", "sale outcome", "transaction status", "purchase status"],
     "sale_region": ["sale_region", "region", "sale_location", "sales territory"],
-    "customer_id": ["customer_id", "user_id", "client_id", "customer_identifier", "user identifier"]
+    "customer_id": ["customer_id", "user_id", "client_id", "customer_identifier", "user identifier"],
+
+    "id" :["User ID","Account ID","Transaction ID"]
 }
 
