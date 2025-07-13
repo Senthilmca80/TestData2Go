@@ -262,7 +262,11 @@ relationship_mapping = {
 }
 
 # Generate and save data
-output_data = generate_dynamic_data_reference(user_input_models, FIELD_METADATA, relationship_mapping, num_rows_per_model=100)
+#output_data = generate_dynamic_data_reference(user_input_models, FIELD_METADATA, relationship_mapping, num_rows_per_model=100)
+def returnAPIResponse(accounts_data_model):
+    print('calling Return API response')
+    print(generate_dynamic_data_reference(user_input_models, FIELD_METADATA, relationship_mapping, num_rows_per_model=100))
+    return 'Success'
 
 '''
 def generate_dynamic_data(model_schemas):

@@ -97,6 +97,8 @@ FIELD_METADATA = {
     "sale_region": ["sale_region", "region", "sale_location", "sales territory"],
     "customer_id": ["customer_id", "user_id", "client_id", "customer_identifier", "user identifier"],
 
-    "id" :["User ID","Account ID","Transaction ID"]
+    "id" :["User ID","Account ID","Transaction ID"],
+    "boolean": ["Is Verified"]
+
 }
 
